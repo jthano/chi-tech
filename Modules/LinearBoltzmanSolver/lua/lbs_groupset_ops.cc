@@ -79,21 +79,17 @@ int chiLBSCreateGroupset(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
-    {
-      fprintf(stderr,"ERROR: Incorrect solver-type"
+      fprintf(stderr,"ERROR: Incorrect solver-type "
                      "in chiLBSCreateGroupset\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(const std::out_of_range& o)
   {
-    fprintf(stderr,"ERROR: Invalid handle to solver"
+    fprintf(stderr,"ERROR: Invalid handle to solver "
                    "in chiLBSCreateGroupset\n");
     exit(EXIT_FAILURE);
   }
@@ -125,27 +121,23 @@ grp[g] = chiLBSCreateGroup(phys1)
 int chiLBSCreateGroup(lua_State *L)
 {
   int solver_index = lua_tonumber(L,1);
-
+  std::cout<<"solver_index = "<<solver_index<<std::endl;
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
-    {
-      fprintf(stderr,"ERROR: Incorrect solver-type"
+      fprintf(stderr,"ERROR: Incorrect solver-type "
                      "in chiLBSCreateGroup\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(const std::out_of_range& o)
   {
-    fprintf(stderr,"ERROR: Invalid handle to solver"
+    fprintf(stderr,"ERROR: Invalid handle to solver "
                    "in chiLBSCreateGroup\n");
     exit(EXIT_FAILURE);
   }
@@ -207,12 +199,8 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       fprintf(stderr,"ERROR: Incorrect solver-type in "
                      "chiLBSGroupsetAddGroups\n");
@@ -313,12 +301,8 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR) << "Incorrect solver-type"
                                    "in chiLBSGroupsetSetQuadrature.";
@@ -433,12 +417,8 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -534,12 +514,8 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -622,12 +598,8 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -725,12 +697,8 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -829,12 +797,8 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -920,12 +884,8 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "

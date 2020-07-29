@@ -1,5 +1,6 @@
 //module:Linear Boltzman Solver
 RegisterFunction(chiLBSCreateSolver)
+RegisterFunction(chiLBSCreateSolver_nlS2)
 
 RegisterFunction(chiLBSSetProperty)
 RegisterConstant(DISCRETIZATION_METHOD,   1);

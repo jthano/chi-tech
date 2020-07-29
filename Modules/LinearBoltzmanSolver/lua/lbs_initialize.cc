@@ -20,20 +20,17 @@ int chiLBSInitialize(lua_State *L)
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
-    {
-      fprintf(stderr,"ERROR: Incorrect solver-type"
+      fprintf(stderr,"ERROR: Incorrect solver-type "
                      "in chiLBSInitialize\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(const std::out_of_range& o)
   {
-    fprintf(stderr,"ERROR: Invalid handle to solver"
+    fprintf(stderr,"ERROR: Invalid handle to solver "
                    "in chiLBSInitialize\n");
     exit(EXIT_FAILURE);
   }

@@ -12,6 +12,8 @@
 
 #include <ChiPhysics/chi_physics_namespace.h>
 
+#include <functional>
+
 namespace LinearBoltzman
 {
   enum class AngleAggregationType
@@ -71,6 +73,9 @@ public:
   bool                                         log_sweep_events;
 
   double                                       latest_convergence_metric;
+
+  typedef std::function<void(int, int, int, double)> MomentCallbackF;
+  std::vector<MomentCallbackF> moment_callbacks;
 
   //npt_groupset.cc
        LBSGroupset();

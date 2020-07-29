@@ -30,6 +30,13 @@ void LinearBoltzman::Solver::PerformInputChecks()
         << grpset_counter << ".";
       exit(EXIT_FAILURE);
     }
+    if (!group_set->quadrature){
+      chi_log.Log(LOG_ALLERROR)
+        << "LinearBoltzman::Solver: groupset "<<grpset_counter<<
+        " does not have any angular quadrature."
+        << grpset_counter << ".";
+      exit(EXIT_FAILURE);
+    }
     ++grpset_counter;
   }
   if (discretization == nullptr)

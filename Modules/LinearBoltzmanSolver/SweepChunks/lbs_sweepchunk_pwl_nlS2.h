@@ -1,5 +1,5 @@
-#ifndef _npt_sweepchunk_pwl_h
-#define _npt_sweepchunk_pwl_h
+#ifndef _npt_sweepchunk_pwl_nlS2_h
+#define _npt_sweepchunk_pwl_nlS2_h
 
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
@@ -21,6 +21,8 @@
 
 #include "ChiTimer/chi_timer.h"
 
+#include <functional>
+
 #include <chi_mpi.h>
 #include <chi_log.h>
 
@@ -32,8 +34,11 @@ typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 
 //###################################################################
 /**Sweep chunk to compute the fixed source.*/
-class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
+class LBSSweepChunkPWLnlS2 : public chi_mesh::sweep_management::SweepChunk
 {
+public:
+  typedef std::function<void(LBSGroupset*, int, int, int, double, double)> moment_callback_func;
+
 protected:
   chi_mesh::MeshContinuum*    grid_view;
   SpatialDiscretization_PWL*     grid_fe_view;
@@ -66,9 +71,11 @@ protected:
   std::vector<double> test_mg_src;
   std::vector<double> zero_mg_src;
 
+  const moment_callback_func & moment_callback;
+
 public:
   //################################################## Constructor
-  LBSSweepChunkPWL(chi_mesh::MeshContinuum* vol_continuum,
+  LBSSweepChunkPWLnlS2(chi_mesh::MeshContinuum* vol_continuum,
                    SpatialDiscretization_PWL* discretization,
                    std::vector<LinearBoltzman::CellViewBase*>* cell_transport_views,
                    LinearBoltzman::Solver& in_ref_solver,
@@ -77,8 +84,10 @@ public:
                    LBSGroupset* in_groupset,
                    TCrossSections* in_xsections,
                    int in_num_moms,
-                   int in_max_cell_dofs) :
-                   ref_solver(in_ref_solver)
+                   int in_max_cell_dofs,
+                   const moment_callback_func & moment_callback=nullptr) :
+                   ref_solver(in_ref_solver),
+                   moment_callback(moment_callback)
   {
     grid_view           = vol_continuum;
     grid_fe_view        = discretization;
@@ -89,6 +98,7 @@ public:
     xsections           = in_xsections;
     num_moms            = in_num_moms;
     max_cell_dofs       = in_max_cell_dofs;
+
 
     G                   = in_groupset->groups.size();
 
@@ -342,10 +352,9 @@ public:
             for (int gsg=0; gsg<gs_ss_size; gsg++)
               phi[ir+gsg] += wn_d2m*b[gsg][i];
 
-            for (auto callback : groupset->moment_callbacks)
-              if(callback)
-                for (int gsg=0; gsg<gs_ss_size; gsg++)
-                  callback(ir+gsg, m, angle_num, b[gsg][i]);
+            if(moment_callback)
+              for (int gsg=0; gsg<gs_ss_size; gsg++)
+                moment_callback(groupset, ir+gsg, m, angle_num, wn_d2m, b[gsg][i]);
           }
         }
 
