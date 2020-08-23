@@ -26,12 +26,8 @@ int chiLBSGetFieldFunctionList(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
       <<"ERROR: Incorrect solver-type"
@@ -83,12 +79,8 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       fprintf(stderr,"ERROR: Incorrect solver-type"
                      "in chiLBSSetProperty\n");

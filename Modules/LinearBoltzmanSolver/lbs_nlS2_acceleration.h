@@ -15,16 +15,13 @@ class NlS2Acceleration : public Solver
 {
 private:
   const double TINY=1.e-8;
-  std::map< LBSGroupset *, std::map<unsigned int,unsigned int> > angular_quad_s2_map;
-  std::shared_ptr<chi_math::ProductQuadrature> quad_uniform_ref;
-  std::vector<std::shared_ptr<chi_math::AngularQuadrature>> quad_store;
+  chi_math::ProductQuadrature quad_uniform_ref;
 
 public:
   std::vector<LBSGroupset *> group_sets_nlS2;
 
- // Vec  phi_old_k;
-  std::vector<double> phi_old_k_local;
-  std::vector<double> delta_phi_local_k;
+  std::vector<double> phi_nlS2;
+  std::vector<double> phi_nlS2_old;
 
   class MomentCallBack{
   public:
@@ -34,14 +31,11 @@ public:
     std::map<int,int> angle_octant_map;
     std::vector<chi_mesh::Vector3> omegas;
     LBSGroupset::MomentCallbackF s2_integrals;
-    void update_funcitonals(int dof_index, int m, int angle_num, double psi);
+    void update_funcitonals(const LinearBoltzman::CellViewFull *, int dof_index, int group, int m, int angle_num, double psi);
     MomentCallBack(LBSGroupset* my_group_reference):my_group_reference(my_group_reference),phi_nlS2(8),M_nlS2(8){};
   };
 
   std::vector<MomentCallBack> nlS2_moment_data;
-
-  std::vector<chi_mesh::sweep_management::SPDS*> sweep_orderings_store;
-  std::vector<chi_mesh::sweep_management::SPDS*> uniform_s2_orderings_store;
 
   NlS2Acceleration();
 
@@ -53,13 +47,15 @@ public:
 //      bool apply_mat_src = false,
 //      bool suppress_phi_old = false) override;
 
-  void InitializeParrays() override;
+  void InitializeParraysNLS2();
 
-  void ClassicRichardsonNLS2(int group_set_num);
+  void ClassicRichardsonNLS2(int group_set_num, SweepChunk* sweep_chunk, MainSweepScheduler & sweepScheduler, bool log_info=true);
 
   void ComputeSweepOrderings_nlS2(LBSGroupset *groupset);
 
   void InitFluxDataStructures_nlS2(LBSGroupset *groupset);
+
+  SweepChunk *SetSweepChunk_nlS2(int group_set_num);
 
 };
 

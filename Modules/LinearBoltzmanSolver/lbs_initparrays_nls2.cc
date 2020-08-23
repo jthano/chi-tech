@@ -1,10 +1,8 @@
 #include "lbs_nlS2_acceleration.h"
 
 
-void LinearBoltzman::NlS2Acceleration::InitializeParrays()
+void LinearBoltzman::NlS2Acceleration::InitializeParraysNLS2()
 {
-
-  LinearBoltzman::Solver::InitializeParrays();
 
   auto pwl_discretization = (SpatialDiscretization_PWL*)discretization;
 
@@ -14,13 +12,17 @@ void LinearBoltzman::NlS2Acceleration::InitializeParrays()
   //================================================== Compute num of unknowns
   int num_grps = groups.size();
   int M = num_moments;
-  unsigned long long local_unknown_count = local_dof_count * num_grps * M;
+  unsigned long long local_unknown_count = local_dof_count * num_grps;
   //================================================== Size local vectors
-  for (auto nlS2 : nlS2_moment_data)
+  phi_nlS2.resize(local_unknown_count,0.0);
+  // I can just use phi_old from high order?
+  phi_nlS2_old.resize(local_unknown_count,0.0);
+  //
+  for (auto & nlS2 : nlS2_moment_data)
   {
     for (unsigned int i=0; i<8; i++){
       nlS2.phi_nlS2[i].resize(local_unknown_count,0.0);
-      nlS2.M_nlS2[i].resize(local_unknown_count,chi_mesh::Vector3());
+      nlS2.M_nlS2[i].resize(local_unknown_count);
     }
   }
 }

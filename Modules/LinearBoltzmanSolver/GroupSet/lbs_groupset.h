@@ -74,7 +74,7 @@ public:
 
   double                                       latest_convergence_metric;
 
-  typedef std::function<void(int, int, int, double)> MomentCallbackF;
+  typedef std::function<void(const LinearBoltzman::CellViewFull *, int, int, int, int, double)> MomentCallbackF;
   std::vector<MomentCallbackF> moment_callbacks;
 
   //npt_groupset.cc

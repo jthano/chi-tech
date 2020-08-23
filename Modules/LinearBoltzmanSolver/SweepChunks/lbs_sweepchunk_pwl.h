@@ -345,7 +345,7 @@ public:
             for (auto callback : groupset->moment_callbacks)
               if(callback)
                 for (int gsg=0; gsg<gs_ss_size; gsg++)
-                  callback(ir+gsg, m, angle_num, b[gsg][i]);
+                  callback(transport_view, i, gsg, m, angle_num, b[gsg][i]);
           }
         }
 

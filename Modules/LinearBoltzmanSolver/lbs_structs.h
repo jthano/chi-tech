@@ -67,18 +67,16 @@ public:
   int dofs;
   int xs_id;
   std::vector<bool> face_local;
-
-private:
-  int num_grps;
-  int num_moms;
+  const int num_grps;
+  const int num_moms;
 
 public:
-  CellViewFull(int in_dofs, int num_G, int num_m)
+  CellViewFull(int in_dofs, int num_G, int num_m):
+    num_grps(num_G),
+    num_moms(num_m)
   {
     dof_phi_map_start = -1;
     dofs = in_dofs;
-    num_grps = num_G;
-    num_moms = num_m;
   }
 
   int MapDOF(int dof, int moment, int grp)

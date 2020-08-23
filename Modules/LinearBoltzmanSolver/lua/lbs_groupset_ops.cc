@@ -968,12 +968,8 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -1057,12 +1053,8 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -1161,12 +1153,8 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
@@ -1271,12 +1259,8 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
   LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
-    {
-      solver = (LinearBoltzman::Solver*)(psolver);
-    }
-    else
+    solver = dynamic_cast<LinearBoltzman::Solver*>(psolver);
+    if (solver == nullptr)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
