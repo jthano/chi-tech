@@ -121,7 +121,7 @@ public:
 
       a_and_b_initialized = true;
     }
-
+   // std::cout<<"---------- Point 1 ----------"<<std::endl;
     chi_mesh::sweep_management::SPDS* spds = angle_set->GetSPDS();
     chi_mesh::sweep_management::FLUDS* fluds = angle_set->fluds;
 
@@ -143,9 +143,9 @@ public:
     double* psi        = zero_mg_src.data();
     double* q_mom      = q_moments->data();
 
-
     //========================================================== Loop over each cell
     size_t num_loc_cells = spds->spls->item_id.size();
+   // std::cout<<"---------- Point 2 ----------"<<std::endl;
     for (int cr_i=0; cr_i<num_loc_cells; cr_i++)
     {
       int  cell_local_id = spds->spls->item_id[cr_i];
@@ -162,7 +162,7 @@ public:
 
       std::vector<bool> face_incident_flags(cell->faces.size(),false);
 
-
+     // std::cout<<"---------- Point 3 ----------"<<std::endl;
       //=================================================== Get Cell matrices
       const std::vector<std::vector<chi_mesh::Vector3>>& L =
         cell_fe_view->IntV_shapeI_gradshapeJ;
@@ -182,6 +182,7 @@ public:
       //========================================== Looping over groups
       double sigma_tgr = 0.0;
       double temp_src = 0.0;
+   //   std::cout<<"---------- Point 4 ----------"<<std::endl;
       for (int gsg=0; gsg<gs_ss_size; gsg++)
       {
 
@@ -189,9 +190,10 @@ public:
           std::cout<<"Error!!!!!!!! in LBSSweepChunkPWL_nlS2::sweep"<<std::endl;
 
         angle_num = angle_set->angles[n];
+//        std::cout<<"-------angle_num = "<<angle_num<<std::endl;
         omega = groupset->quadrature->omegas[angle_num];
         wn    = groupset->quadrature->weights[angle_num];
-
+     //   std::cout<<"---------- Point 5 ----------"<<std::endl;
         //============================================ Gradient matrix
         for (int i=0; i<cell_dofs; i++)
         {
@@ -201,7 +203,7 @@ public:
             Amat[i][j] = M_nlS2[angle_num][s2_dof].Dot(L[i][j]);
           }//for j
         }//for i
-
+     //   std::cout<<"---------- Point 6 ----------"<<std::endl;
         for (int gsg=0; gsg<gs_ss_size; gsg++)
           b[gsg].assign(cell_dofs,0.0);
 
@@ -211,9 +213,10 @@ public:
         int in_face_counter=-1;
         for (int f=0; f<num_faces; f++)
         {
+     //     std::cout<<"---------- Point 7 ----------"<<std::endl;
           //TODO: can use any direction for a structured mesh
           // need to gix in general
-          double mu              =  M_nlS2[angle_num][0].Dot(cell->faces[f].normal);
+          double mu              =  omega.Dot(cell->faces[f].normal);
           auto& face             = cell->faces[f];
           bool  face_on_boundary = grid_view->IsCellBndry(face.neighbor);
           bool neighbor_is_local = (transport_view->face_local[f]);
@@ -258,6 +261,9 @@ public:
               {
                 int j = cell_fe_view->face_dof_mappings[f][fj];
 
+                const int s2_dof = get_nlS2_dof(transport_view, j, gsg);
+                mu = M_nlS2[angle_num][s2_dof].Dot(cell->faces[f].normal);
+
                 // %%%%% LOCAL CELL DEPENDENCY %%%%%
                 if (neighbor_is_local)
                 {psi = fluds->UpwindPsi(cr_i,in_face_counter,fj,0,n);}
@@ -266,14 +272,20 @@ public:
                 {psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,n);}
                   // %%%%% BOUNDARY CELL DEPENDENCY %%%%%
                 else
-                {psi = angle_set->PsiBndry(bndry_map,
+                {  psi = angle_set->PsiBndry(bndry_map,
                                            angle_num,
                                            cell->local_id,
                                            f,fj,gs_gi,gs_ss_begin,
                                            suppress_surface_src);
+                  //TODO: reflecting boundaries?
+                  if (!angle_set->ref_boundaries[bndry_map]->IsReflecting())
+                  {
+                    //If isotropic incoming flux, need to use average direction
+                    if (psi[0]>0)
+                      mu = omega.Dot(cell->faces[f].normal);
+                  }
                 }
-                const int s2_dof = get_nlS2_dof(transport_view, j, gsg);
-                mu = M_nlS2[angle_num][s2_dof].Dot(cell->faces[f].normal);
+
 
                 double mu_Nij = -mu*N[f][i][j];
 
@@ -282,12 +294,12 @@ public:
                 for (int gsg=0; gsg<gs_ss_size; gsg++)
                   b[gsg][i] += psi[gsg]*mu_Nij;
               }
-            };
+            }
 
           }//if mu<0.0
 
         }//for f
-
+     //   std::cout<<"---------- Point 8 ----------"<<std::endl;
         g = gs_gi+gsg;
 
         //============================= Contribute source moments
@@ -301,9 +313,11 @@ public:
 
             int ir = transport_view->MapDOF(i,m,g);
             temp_src += m2d*q_mom[ir];
+    //        std::cout<<"m2d = "<<m2d<<'\n';
           }
           source[i] = temp_src;
         }
+     //   std::cout<<"---------- Point 9 ----------"<<std::endl;
 
         //============================= Mass Matrix and Source
         sigma_tgr = sigma_tg[g];
@@ -318,27 +332,31 @@ public:
           }//for j
           b[gsg][i] += temp;
         }//for i
+      //  std::cout<<"---------- Point 10 ----------"<<std::endl;
 
         //============================= Solve system
         chi_math::GaussElimination(Atemp,b[gsg],cell_fe_view->dofs);
 
-
+    //    std::cout<<"---------- Point 11 ----------"<<std::endl;
       }//for g
 
       //============================= Accumulate flux
 
       for (int i=0; i<cell_fe_view->dofs; i++)
       {
+        //TODO: Need to put this in the proper place consider more moments
         const int s2_dof = get_nlS2_dof(transport_view, i, gs_gi);
 
         for (int gsg=0; gsg<gs_ss_size; gsg++)
-          phi[s2_dof+gsg] += b[gsg][i];
+          phi[s2_dof+gsg] += b[gsg][i]/8.;
       }
+   //   std::cout<<"---------- Point 12 ----------"<<std::endl;
 
       //============================================= Outgoing fluxes
       int out_face_counter=-1;
       for (int f=0; f<cell->faces.size(); f++)
       {
+    //    std::cout<<"---------- Point 13 ----------"<<std::endl;
         if (face_incident_flags[f]) continue;
 
         //============================= Set flags and counters
@@ -353,23 +371,27 @@ public:
           bndry_index = -(face.neighbor + 1);
         }
 
-
+    //    std::cout<<"---------- Point 14 ----------"<<std::endl;
 
         //============================= Store outgoing Psi Locally
         if (transport_view->face_local[f])
         {
+//          std::cout<<"---------- Point 15 ----------"<<std::endl;
+//          std::cout<<"out_face_counter = "<<out_face_counter<<std::endl;
           for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
           {
             int i = cell_fe_view->face_dof_mappings[f][fi];
             psi = fluds->OutgoingPsi(cr_i,out_face_counter,fi,n);
-
+            //dying here
             for (int gsg=0; gsg<gs_ss_size; gsg++)
               psi[gsg] = b[gsg][i];
           }
+//          std::cout<<"---------- Point 16 ----------"<<std::endl;
         }//
         //============================= Store outgoing Psi Non-Locally
         else if (not face_on_boundary)
         {
+//          std::cout<<"---------- Point 17 ----------"<<std::endl;
           deploc_face_counter++;
           for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
           {
@@ -379,10 +401,12 @@ public:
             for (int gsg=0; gsg<gs_ss_size; gsg++)
               psi[gsg] = b[gsg][i];
           }//for fdof
+//          std::cout<<"---------- Point 18 ----------"<<std::endl;
         }//if non-local
           //============================= Store outgoing reflecting Psi
         else if (angle_set->ref_boundaries[bndry_index]->IsReflecting())
         {
+//          std::cout<<"---------- Point 19 ----------"<<std::endl;
           for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
           {
             int i = cell_fe_view->face_dof_mappings[f][fi];
@@ -393,10 +417,11 @@ public:
             for (int gsg=0; gsg<gs_ss_size; gsg++)
               psi[gsg] = b[gsg][i];
           }//for fdof
+//          std::cout<<"---------- Point 20 ----------"<<std::endl;
         }//reflecting
       }//for f
 
-
+//      std::cout<<"---------- Point END ----------"<<std::endl;
 //      }//for n
 
     }// for cell

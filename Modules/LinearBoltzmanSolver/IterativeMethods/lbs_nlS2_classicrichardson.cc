@@ -35,7 +35,7 @@ void LinearBoltzman::NlS2Acceleration::ClassicRichardsonNLS2(int group_set_num, 
   }
 
   //================================================== Obtain groupset
-  LBSGroupset* groupset = group_sets[group_set_num];
+  LBSGroupset* groupset = group_sets_nlS2[group_set_num];
   int groupset_numgrps = groupset->groups.size();
 
   if (log_info)

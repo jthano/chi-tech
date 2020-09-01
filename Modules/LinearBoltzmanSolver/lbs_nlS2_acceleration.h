@@ -19,9 +19,9 @@ private:
 
 public:
   std::vector<LBSGroupset *> group_sets_nlS2;
-
-  std::vector<double> phi_nlS2;
-  std::vector<double> phi_nlS2_old;
+  std::vector<chi_mesh::sweep_management::SPDS*> sweep_orderings_nlS2;
+  std::vector<SweepBndry*>                      sweep_boundaries_nlS2;
+  std::vector<std::vector<double>>              incident_P0_mg_boundaries_nlS2;
 
   class MomentCallBack{
   public:
@@ -53,9 +53,9 @@ public:
 
   void ComputeSweepOrderings_nlS2(LBSGroupset *groupset);
 
-  void InitFluxDataStructures_nlS2(LBSGroupset *groupset);
-
   SweepChunk *SetSweepChunk_nlS2(int group_set_num);
+
+  void InitAngleAggSingle_nlS2(LBSGroupset *groupset);
 
 };
 

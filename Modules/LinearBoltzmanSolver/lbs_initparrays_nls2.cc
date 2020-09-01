@@ -14,9 +14,6 @@ void LinearBoltzman::NlS2Acceleration::InitializeParraysNLS2()
   int M = num_moments;
   unsigned long long local_unknown_count = local_dof_count * num_grps;
   //================================================== Size local vectors
-  phi_nlS2.resize(local_unknown_count,0.0);
-  // I can just use phi_old from high order?
-  phi_nlS2_old.resize(local_unknown_count,0.0);
   //
   for (auto & nlS2 : nlS2_moment_data)
   {
