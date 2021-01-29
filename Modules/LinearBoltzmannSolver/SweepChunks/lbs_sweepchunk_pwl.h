@@ -11,8 +11,8 @@
 #include "ChiPhysics/chi_physics.h"
 
 #include "ChiMath/chi_math.h"
-#include "Modules/LinearBoltzmannSolver/GroupSet/lbs_groupset.h"
-#include "Modules/LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
+#include "LinearBoltzmannSolver/GroupSet/lbs_groupset.h"
+#include "LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
@@ -37,7 +37,6 @@ protected:
   chi_mesh::MeshContinuum* grid_view;
   SpatialDiscretization_PWL* grid_fe_view;
   const std::vector<LinearBoltzmann::CellViewBase*>* grid_transport_view;
-  const LinearBoltzmann::Solver& ref_solver;
   const std::vector<double>* q_moments;
   const LBSGroupset* groupset;
   const TCrossSections* xsections;
@@ -55,7 +54,6 @@ public:
   LBSSweepChunkPWL(chi_mesh::MeshContinuum* vol_continuum,
                    SpatialDiscretization_PWL* discretization,
                    const std::vector<LinearBoltzmann::CellViewBase*>* cell_transport_views,
-                   const LinearBoltzmann::Solver& in_ref_solver,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
                    const LBSGroupset* in_groupset,
@@ -66,7 +64,6 @@ public:
       grid_view(vol_continuum),
       grid_fe_view(discretization),
       grid_transport_view(cell_transport_views),
-      ref_solver(in_ref_solver),
       q_moments(source_moments),
       groupset(in_groupset),
       xsections(in_xsections),

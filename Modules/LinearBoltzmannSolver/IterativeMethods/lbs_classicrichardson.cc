@@ -1,7 +1,5 @@
-#include "../lbs_linear_boltzmann_solver.h"
-
-
-#include "../../DiffusionSolver/Solver/diffusion_solver.h"
+#include "LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
+#include "DiffusionSolver/Solver/diffusion_solver.h"
 
 #include <ChiTimer/chi_timer.h>
 

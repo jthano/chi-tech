@@ -16,7 +16,6 @@ SweepChunk* LinearBoltzmann::Solver::SetSweepChunk(int group_set_num)
         grid,                                    //Spatial grid of cells
         (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views
-        *this,
         &phi_new_local,                          //Destination phi
         &q_moments_local,                        //Source moments
         groupset,                                //Reference groupset
